@@ -6,7 +6,7 @@ export default function HomePage() {
       {/* Hero Badge */}
       <div className="inline-flex items-center gap-2 px-4 py-2 mb-6 text-sm font-medium text-indigo-400 bg-indigo-950/60 border border-indigo-800/50 rounded-full backdrop-blur-md">
         <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-        TOVOAI.COM Standalone AI Image CDN Server Active
+        TOVOAI.COM Standalone AI Image CDN Server Active (v1.01.0)
       </div>
 
       {/* Main Headline */}
@@ -25,7 +25,13 @@ export default function HomePage() {
           href="/gallery"
           className="px-8 py-4 text-base font-semibold text-white bg-indigo-600 rounded-xl shadow-lg shadow-indigo-600/30 hover:bg-indigo-500 transition-all transform hover:-translate-y-0.5"
         >
-          🖼️ 이미지 갤러리 스튜디오 열기
+          🖼️ 이미지 갤러리 스튜디오
+        </Link>
+        <Link
+          href="/admin"
+          className="px-8 py-4 text-base font-semibold text-slate-200 bg-slate-800/90 border border-indigo-500/40 rounded-xl hover:bg-indigo-900/60 hover:text-white transition-all shadow-md shadow-indigo-950/50"
+        >
+          ⚙️ 관리자 설정 (Admin v1.01)
         </Link>
         <a
           href="https://cdn.tovoai.com"
@@ -33,7 +39,7 @@ export default function HomePage() {
           rel="noreferrer"
           className="px-8 py-4 text-base font-semibold text-slate-300 bg-slate-800/80 border border-slate-700/60 rounded-xl hover:bg-slate-700 hover:text-white transition-all"
         >
-          🌐 cdn.tovoai.com 연결 상태 확인
+          🌐 cdn.tovoai.com 연결 상태
         </a>
       </div>
 
