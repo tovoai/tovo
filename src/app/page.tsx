@@ -320,11 +320,23 @@ export default function Page() {
                   8K Gallery
                 </Link>
                 <Link
+                  href="/benchmark"
+                  className="text-sm font-medium text-cyan-400 font-bold transition hover:text-cyan-300"
+                >
+                  Global Benchmark
+                </Link>
+                <Link
+                  href="/admin/client-audit"
+                  className="text-sm font-medium text-indigo-400 transition hover:text-indigo-300"
+                >
+                  Client Audit
+                </Link>
+                <Link
                   href="/admin"
-                  className="flex items-center gap-1.5 text-sm font-medium text-indigo-400 transition hover:text-indigo-300"
+                  className="flex items-center gap-1.5 text-sm font-medium text-slate-300 transition hover:text-white"
                 >
                   <Settings className="h-4 w-4" />
-                  Admin Console (관리자)
+                  Admin Console
                 </Link>
               </nav>
 

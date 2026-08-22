@@ -3,19 +3,12 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import {
-  Sparkles,
-  Zap,
-  Globe,
   Sliders,
   Code,
   CheckCircle2,
   Copy,
   Check,
   Award,
-  Layers,
-  ArrowRight,
-  ShieldCheck,
-  Cpu,
 } from "lucide-react";
 import {
   applyStylePresetToPrompt,

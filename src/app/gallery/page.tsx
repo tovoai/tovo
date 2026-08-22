@@ -102,11 +102,17 @@ export default function GalleryPage() {
             </span>
             <span className="text-lg font-black text-white tracking-tight">TOVOAI 8K GALLERY</span>
           </Link>
-          <div className="flex items-center gap-4">
-            <Link href="/" className="text-xs font-mono text-slate-400 hover:text-white">
+          <div className="flex items-center gap-4 text-xs font-mono">
+            <Link href="/" className="text-slate-400 hover:text-white">
               Home
             </Link>
-            <Link href="/admin" className="text-xs font-mono text-indigo-400 hover:text-indigo-300">
+            <Link href="/benchmark" className="text-cyan-400 hover:text-cyan-300 font-bold">
+              /benchmark (글로벌 벤치마크)
+            </Link>
+            <Link href="/admin/client-audit" className="text-indigo-400 hover:text-indigo-300">
+              /client-audit (고객사 분석)
+            </Link>
+            <Link href="/admin" className="text-slate-400 hover:text-white">
               /admin (관리자)
             </Link>
           </div>

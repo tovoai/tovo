@@ -20,7 +20,7 @@ export default function AdminPage() {
               <div className="flex items-center space-x-2">
                 <h1 className="text-xl font-bold tracking-tight text-white">TOVOAI Control Studio</h1>
                 <span className="px-2 py-0.5 text-xs font-semibold bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 rounded-full">
-                  v1.01.0
+                  v1.03.0
                 </span>
               </div>
               <p className="text-xs text-slate-400">Independent AI CDN &amp; Storage Management Console</p>
@@ -40,6 +40,12 @@ export default function AdminPage() {
               className="px-3.5 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-900 transition flex items-center gap-1.5"
             >
               <span>🔍 고객사 분석 &amp; 에셋 할당</span>
+            </Link>
+            <Link
+              href="/benchmark"
+              className="px-3.5 py-2 rounded-lg text-cyan-400 hover:text-cyan-300 hover:bg-slate-900 transition flex items-center gap-1.5 font-bold"
+            >
+              <span>🏆 글로벌 벤치마크</span>
             </Link>
             <Link
               href="/gallery"
