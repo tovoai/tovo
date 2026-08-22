@@ -5,6 +5,7 @@
  * src/app/page.tsx
  *
  * Stack: Next.js 15 (App Router) / React 19 / Tailwind CSS / TypeScript
+ * Fonts: Space Grotesk (display), Inter (body), JetBrains Mono (data / CDN strings)
  */
 
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -207,13 +208,14 @@ function CdnUrlBar() {
     try {
       await navigator.clipboard.writeText(CDN_SAMPLE_URL);
     } catch {
+      // Clipboard API unavailable — fail silently, UI still reflects intent.
     }
     setCopied(true);
     setTimeout(() => setCopied(false), 1800);
   };
 
   return (
-    <div className="relative flex items-center gap-2 rounded-lg border border-white/10 bg-slate-950/70 px-3 py-2.5 sm:px-4">
+    <div className="flex items-center gap-2 rounded-lg border border-white/10 bg-slate-950/70 px-3 py-2.5 sm:px-4">
       <Link2 className="h-4 w-4 shrink-0 text-slate-500" />
       <code className="min-w-0 flex-1 overflow-x-auto whitespace-nowrap font-mono text-[12px] text-slate-300 sm:text-[13px]">
         {CDN_SAMPLE_URL}
