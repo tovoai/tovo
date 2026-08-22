@@ -9,3 +9,4 @@ export * from "./tovoai-embedding";
 export * from "./tovoai-taxonomy";
 export * from "./tovoai-seo-injector";
 export * from "./tovoai-client-audit";
+export * from "./tovoai-benchmark";
