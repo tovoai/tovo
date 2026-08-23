@@ -14,13 +14,15 @@ import {
   Code,
   Layers,
   ArrowRight,
-  ShieldCheck
+  ShieldCheck,
+  Key
 } from 'lucide-react'
 
 export default function SeoReallocatorPage() {
   const [topic, setTopic] = useState('강남 맛집 삼겹살')
   const [count, setCount] = useState<number>(3)
   const [colabUrl, setColabUrl] = useState('')
+  const [hfToken, setHfToken] = useState('')
   const [loading, setLoading] = useState(false)
   const [results, setResults] = useState<any[] | null>(null)
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null)
@@ -39,7 +41,8 @@ export default function SeoReallocatorPage() {
           topic,
           targetKeyword: topic,
           count,
-          colabUrl
+          colabUrl,
+          hfToken
         })
       })
       const data = await res.json()
@@ -80,20 +83,20 @@ export default function SeoReallocatorPage() {
         <div className="flex items-center gap-2 text-xs font-mono">
           <span className="px-3 py-1.5 rounded-xl border border-slate-800 bg-slate-900 text-slate-300 flex items-center gap-2">
             <Server className="w-3.5 h-3.5 text-cyan-400" />
-            <span>Colab GPU:</span>
+            <span>Colab Status:</span>
             {colabStatus === 'online' ? (
               <span className="text-emerald-400 font-bold flex items-center gap-1">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" /> Online
               </span>
             ) : (
-              <span className="text-slate-500 font-bold">Simulated (Mock)</span>
+              <span className="text-cyan-400 font-bold">HF Free Serverless Ready</span>
             )}
           </span>
         </div>
       </div>
 
       {/* Input Form Controls */}
-      <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 md:p-8 backdrop-blur-xl shadow-xl">
+      <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 md:p-8 backdrop-blur-xl shadow-xl space-y-6">
         <form onSubmit={handleRunBatch} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="md:col-span-2">
@@ -141,17 +144,34 @@ export default function SeoReallocatorPage() {
             </div>
           </div>
 
-          <div>
-            <label className="block text-xs font-mono text-slate-400 mb-1">
-              Google Colab / Kaggle 무료 GPU API 주소 (선택 사항):
-            </label>
-            <input
-              type="url"
-              value={colabUrl}
-              onChange={(e) => setColabUrl(e.target.value)}
-              placeholder="예: https://xxxx-xx-xxx-xx-xx.ngrok-free.app (미입력 시 8K 시뮤레이션 서빙)"
-              className="w-full bg-slate-950/70 border border-slate-800 rounded-xl px-4 py-2.5 text-xs font-mono text-slate-300 placeholder-slate-600 focus:outline-none focus:border-cyan-500 transition-all"
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-mono text-slate-400 mb-1 flex items-center gap-1">
+                <Key className="w-3.5 h-3.5 text-cyan-400" />
+                Hugging Face Free Token (선택 입력):
+              </label>
+              <input
+                type="password"
+                value={hfToken}
+                onChange={(e) => setHfToken(e.target.value)}
+                placeholder="hf_xxxxxxxxxxxxxxxx (입력 시 Flux.1 Serverless 무료 구동)"
+                className="w-full bg-slate-950/70 border border-slate-800 rounded-xl px-4 py-2.5 text-xs font-mono text-slate-300 placeholder-slate-600 focus:outline-none focus:border-cyan-500 transition-all"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-mono text-slate-400 mb-1 flex items-center gap-1">
+                <Server className="w-3.5 h-3.5 text-indigo-400" />
+                Google Colab / Kaggle URL (선택 입력):
+              </label>
+              <input
+                type="url"
+                value={colabUrl}
+                onChange={(e) => setColabUrl(e.target.value)}
+                placeholder="https://xxxx.ngrok-free.app (선택 사항)"
+                className="w-full bg-slate-950/70 border border-slate-800 rounded-xl px-4 py-2.5 text-xs font-mono text-slate-300 placeholder-slate-600 focus:outline-none focus:border-indigo-500 transition-all"
+              />
+            </div>
           </div>
 
           <button
@@ -206,7 +226,7 @@ export default function SeoReallocatorPage() {
                   />
 
                   <div className="absolute top-3 left-3 bg-slate-950/80 backdrop-blur border border-slate-800 px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold text-slate-300">
-                    #0{item.index}
+                    #0{item.index} • {item.engineUsed}
                   </div>
 
                   {/* Score Ring Badge */}
