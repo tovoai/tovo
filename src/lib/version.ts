@@ -1,5 +1,5 @@
-import pkg from '../../../package.json';
+export const APP_VERSION = '1.06.00';
 
 export function getAppVersion(): string {
-  return pkg.version || '1.06.00';
+  return APP_VERSION;
 }
