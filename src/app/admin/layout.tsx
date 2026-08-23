@@ -17,7 +17,8 @@ import {
   User,
   Home,
   Menu,
-  X
+  X,
+  RefreshCw
 } from 'lucide-react'
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -49,6 +50,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       href: '/admin',
       icon: LayoutDashboard,
       exact: true,
+    },
+    {
+      name: 'SEO 점수 & 배치 생성',
+      href: '/admin/seo-reallocator',
+      icon: RefreshCw,
     },
     {
       name: '고객사 분석 & 에셋',
