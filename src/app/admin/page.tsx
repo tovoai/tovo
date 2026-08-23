@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import TovoaiArchiveTreeTab from '@/components/admin/TovoaiArchiveTreeTab';
 
 export const metadata = {
   title: 'TOVOAI Admin - AI Image & Storage Control Center',
@@ -146,6 +147,13 @@ export default function AdminPage() {
               <p className="text-xs text-slate-500 mt-2">영어/한국어 다국어 스위처 및 88px 실사 콘솔</p>
             </Link>
           </div>
+        </section>
+
+        {/* 4-Level TOVOAI Archive Taxonomy Tree */}
+        <section className="bg-slate-900/70 border border-slate-800 rounded-2xl p-6 shadow-xl">
+          <h2 className="text-lg font-bold text-white mb-1">🌳 TOVOAI 4단계 아카이브 분류 트리</h2>
+          <p className="text-xs text-slate-400 mb-6">10 L1 Major · 35 L2 Mid · 25 L3 Sub 카테고리 · 768D AI 임베딩 감사 패널</p>
+          <TovoaiArchiveTreeTab />
         </section>
       </main>
     </div>
