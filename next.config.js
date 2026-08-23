@@ -10,6 +10,14 @@ const nextConfig = {
       { protocol: 'https', hostname: '*.supabase.co' },
       { protocol: 'https', hostname: 'images.unsplash.com' }
     ]
+  },
+  async rewrites() {
+    return [
+      {
+        source: '/cdn-proxy/:path*',
+        destination: 'https://shypmvpylzsfkaqynknk.supabase.co/storage/v1/object/public/post_images/:path*'
+      }
+    ];
   }
 };
 

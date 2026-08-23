@@ -38,6 +38,7 @@ import {
   ChevronRight,
   Globe,
 } from "lucide-react";
+import { AuthNavButtons } from "./components/AuthNavButtons";
 
 /* -------------------------------------------------------------------------- */
 /* Translations (EN / KO)                                                     */
@@ -98,6 +99,12 @@ const DICT = {
     layer3Title: "Cloudflare & Supabase Infrastructure",
     layer3Desc:
       "Dedicated storage and edge delivery provide a persistent public asset layer with zero quota limits.",
+    navFeatures: "Features",
+    navCdnStatus: "CDN Status",
+    navGallery: "8K Gallery",
+    navBenchmark: "Global Benchmark",
+    navClientAudit: "Client Audit",
+    navAdminConsole: "Admin Console",
     flowTitle: "From Korean idea to globally delivered image.",
     flowSub: "Prompt → Semantic Parsing → 8K Render → SEO Alt → Cloud Storage → Edge CDN",
     footerCopy: "© 2026 TOVOAI Inc. All rights reserved. Version 1.01.0",
@@ -155,6 +162,12 @@ const DICT = {
     layer3Title: "Cloudflare & Supabase 인프라",
     layer3Desc:
       "전용 클라우드 스토리지와 엣지 라우팅을 통해 쿼터 제한 없이 영구적인 이미지를 클라우드에서 제공합니다.",
+    navFeatures: "주요 기능",
+    navCdnStatus: "CDN 현황",
+    navGallery: "8K 갤러리",
+    navBenchmark: "글로벌 벤치마크",
+    navClientAudit: "고객사 감사",
+    navAdminConsole: "관리자 콘솔",
     flowTitle: "한글 아이디어부터 글로벌 CDN 서빙까지.",
     flowSub: "한글 프롬프트 → 시맨틱 파싱 → 8K 렌더링 → SEO ALT → 클라우드 저장 → 글로벌 CDN",
     footerCopy: "© 2026 TOVOAI Inc. All rights reserved. Version 1.01.0",
@@ -221,6 +234,15 @@ export default function Page() {
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const t = DICT[lang];
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const userLang = navigator.language || (navigator as any).userLanguage;
+      if (userLang && userLang.toLowerCase().startsWith("ko")) {
+        setLang("ko");
+      }
+    }
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -291,11 +313,8 @@ export default function Page() {
                   <Sparkles className="h-4 w-4 text-white" />
                 </span>
                 <span className="flex items-center gap-2">
-                  <span className="text-lg font-black tracking-tight text-white">
+                  <span className="text-lg font-black tracking-tight text-white group-hover:text-cyan-300 transition-colors">
                     TOVOAI
-                  </span>
-                  <span className="rounded-md border border-cyan-400/30 bg-cyan-400/10 px-1.5 py-0.5 font-mono text-[9px] font-bold text-cyan-300">
-                    v1.01.0
                   </span>
                 </span>
               </Link>
@@ -305,38 +324,19 @@ export default function Page() {
                   href="#features"
                   className="text-sm font-medium text-slate-400 transition hover:text-white"
                 >
-                  Features
+                  {t.navFeatures}
                 </a>
                 <a
                   href="#cdn-status"
                   className="text-sm font-medium text-slate-400 transition hover:text-white"
                 >
-                  CDN Status
+                  {t.navCdnStatus}
                 </a>
                 <Link
                   href="/gallery"
                   className="text-sm font-medium text-slate-400 transition hover:text-white"
                 >
-                  8K Gallery
-                </Link>
-                <Link
-                  href="/benchmark"
-                  className="text-sm font-medium text-cyan-400 font-bold transition hover:text-cyan-300"
-                >
-                  Global Benchmark
-                </Link>
-                <Link
-                  href="/admin/client-audit"
-                  className="text-sm font-medium text-indigo-400 transition hover:text-indigo-300"
-                >
-                  Client Audit
-                </Link>
-                <Link
-                  href="/admin"
-                  className="flex items-center gap-1.5 text-sm font-medium text-slate-300 transition hover:text-white"
-                >
-                  <Settings className="h-4 w-4" />
-                  Admin Console
+                  {t.navGallery}
                 </Link>
               </nav>
 
@@ -359,6 +359,10 @@ export default function Page() {
                   <span>Launch Studio</span>
                   <ChevronRight className="h-4 w-4" />
                 </Link>
+
+                {/* Auth Login / Profile Navigation */}
+                <AuthNavButtons />
+
 
                 <button
                   type="button"
@@ -404,6 +408,8 @@ export default function Page() {
                     Admin Console (관리자)
                   </Link>
                 </div>
+                {/* Auth Login / Profile Navigation */}
+                <AuthNavButtons />
               </div>
             )}
           </div>

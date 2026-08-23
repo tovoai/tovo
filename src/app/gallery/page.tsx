@@ -96,24 +96,18 @@ export default function GalleryPage() {
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-white/10 bg-slate-950/80 backdrop-blur-xl px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3">
+          <Link href="/" className="flex items-center gap-3 group">
             <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-cyan-400">
               <Sparkles className="h-4 w-4 text-white" />
             </span>
-            <span className="text-lg font-black text-white tracking-tight">TOVOAI 8K GALLERY</span>
+            <span className="text-lg font-black text-white tracking-tight group-hover:text-cyan-300 transition-colors">TOVOAI 8K GALLERY</span>
           </Link>
           <div className="flex items-center gap-4 text-xs font-mono">
             <Link href="/" className="text-slate-400 hover:text-white">
-              Home
+              Home (홈으로)
             </Link>
-            <Link href="/benchmark" className="text-cyan-400 hover:text-cyan-300 font-bold">
-              /benchmark (글로벌 벤치마크)
-            </Link>
-            <Link href="/admin/client-audit" className="text-indigo-400 hover:text-indigo-300">
-              /client-audit (고객사 분석)
-            </Link>
-            <Link href="/admin" className="text-slate-400 hover:text-white">
-              /admin (관리자)
+            <Link href="/admin" className="text-indigo-400 hover:text-indigo-300 font-bold">
+              Admin Console (관리자)
             </Link>
           </div>
         </div>

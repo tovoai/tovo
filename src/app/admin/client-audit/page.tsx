@@ -80,56 +80,8 @@ export default function ClientAuditPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-indigo-500/30 selection:text-white">
-      {/* Top Header Navigation */}
-      <header className="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
-          <Link href="/admin" className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center font-bold text-white shadow-lg shadow-indigo-500/20">
-              TV
-            </div>
-            <div>
-              <div className="flex items-center space-x-2">
-                <h1 className="text-xl font-bold tracking-tight text-white">TOVOAI Control Studio</h1>
-                <span className="px-2 py-0.5 text-xs font-semibold bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 rounded-full">
-                  v1.03.0
-                </span>
-              </div>
-              <p className="text-xs text-slate-400">Independent AI CDN &amp; Storage Management Console</p>
-            </div>
-          </Link>
+    <div className="space-y-10 max-w-7xl mx-auto">
 
-          {/* Unified Admin Navigation Links */}
-          <nav className="flex items-center space-x-2 bg-slate-950/80 p-1.5 rounded-xl border border-slate-800 text-xs font-medium">
-            <Link
-              href="/admin"
-              className="px-3.5 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-900 transition flex items-center gap-1.5"
-            >
-              <span>📊 컨트롤 개요</span>
-            </Link>
-            <Link
-              href="/admin/client-audit"
-              className="px-3.5 py-2 rounded-lg bg-indigo-600 text-white font-bold shadow-md shadow-indigo-600/30 flex items-center gap-1.5"
-            >
-              <span>🔍 고객사 분석 &amp; 에셋 할당</span>
-            </Link>
-            <Link
-              href="/gallery"
-              className="px-3.5 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-900 transition flex items-center gap-1.5"
-            >
-              <span>🎨 8K 갤러리 &amp; SEO 주입기</span>
-            </Link>
-            <Link
-              href="/"
-              className="px-3.5 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-900 transition flex items-center gap-1.5"
-            >
-              <span>🌐 메인 라이브</span>
-            </Link>
-          </nav>
-        </div>
-      </header>
-
-      <main className="max-w-7xl mx-auto px-6 py-12">
         {/* Title & Client Selector */}
         <div className="mb-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <div>
@@ -268,7 +220,6 @@ export default function ClientAuditPage() {
             </Link>
           </div>
         </section>
-      </main>
     </div>
   );
 }
