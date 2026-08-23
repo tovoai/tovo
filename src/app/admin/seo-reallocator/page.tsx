@@ -113,22 +113,30 @@ export default function SeoReallocatorPage() {
             <div>
               <div className="flex justify-between items-center mb-2">
                 <label className="text-xs font-mono text-slate-300">
-                  생성 수량 지정 (Count):
+                  생성 수량 지정 (Count: 1~1000장):
                 </label>
-                <span className="text-xs font-mono font-bold text-cyan-400">{count}장</span>
+                <input
+                  type="number"
+                  min="1"
+                  max="1000"
+                  value={count}
+                  onChange={(e) => setCount(Math.min(1000, Math.max(1, Number(e.target.value) || 1)))}
+                  className="w-20 bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-xs font-mono font-bold text-cyan-400 text-right"
+                />
               </div>
               <input
                 type="range"
                 min="1"
-                max="10"
+                max="1000"
                 value={count}
                 onChange={(e) => setCount(Number(e.target.value))}
                 className="w-full h-2 bg-slate-950 rounded-lg appearance-none cursor-pointer accent-indigo-500"
               />
               <div className="flex justify-between text-[10px] font-mono text-slate-500 mt-1">
                 <span>1장</span>
-                <span>5장</span>
-                <span>10장</span>
+                <span>100장</span>
+                <span>500장</span>
+                <span>1000장</span>
               </div>
             </div>
           </div>

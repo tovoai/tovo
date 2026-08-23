@@ -13,7 +13,7 @@ export async function POST(request: Request) {
       targetKeyword = '강남 맛집 삼겹살'
     } = body
 
-    const requestedCount = Math.min(Math.max(Number(count) || 1, 1), 10)
+    const requestedCount = Math.min(Math.max(Number(count) || 1, 1), 1000)
     const results: any[] = []
 
     // Attempt to call Colab GPU if colabUrl is provided
