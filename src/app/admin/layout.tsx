@@ -57,6 +57,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       icon: RefreshCw,
     },
     {
+      name: 'AI 블로그 양산소',
+      href: '/admin/content-factory',
+      icon: Sparkles,
+    },
+    {
       name: '고객분석',
       href: '/admin/client-audit',
       icon: BarChart3,
