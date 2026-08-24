@@ -15,7 +15,8 @@ import {
   Send,
   Loader2,
   Cpu,
-  Key
+  Key,
+  Plus
 } from 'lucide-react'
 
 export default function ContentFactoryPage() {
@@ -35,15 +36,17 @@ export default function ContentFactoryPage() {
 
   // Generation State
   const [generatingBlog, setGeneratingBlog] = useState(false)
-  const [generatedBlogContent, setGeneratedBlogContent] = useState<any | null>(null)
+  const [generatedArticle, setGeneratedArticle] = useState<any | null>(null)
   const [copiedBlog, setCopiedBlog] = useState(false)
+  const [injectedImages, setInjectedImages] = useState<Record<number, any>>({})
 
   // Step 1: Recommend SEO Keyword & Title Strategy
   const handleRecommendStrategy = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoadingStrategy(true)
     setStrategies(null)
-    setGeneratedBlogContent(null)
+    setGeneratedArticle(null)
+    setInjectedImages({})
 
     try {
       const res = await fetch('/api/blog-strategy', {
@@ -75,46 +78,60 @@ export default function ContentFactoryPage() {
     setNicheKeyword(item.nicheKeyword)
   }
 
-  // Step 2 & 3: Generate AI Blog Text First ➔ Auto Inject Matching 8K Image
-  const handleGenerateBlog = async () => {
+  // Step 2: Generate PURE TEXT Blog Post First (NO IMAGES Initially!)
+  const handleGenerateArticleOnly = async () => {
     if (!finalTitle) return
     setGeneratingBlog(true)
+    setGeneratedArticle(null)
+    setInjectedImages({})
 
-    // Simulate AI Blog Text Generation + Subsequent 8K Image Auto Injection
-    setTimeout(() => {
-      setGeneratedBlogContent({
-        title: finalTitle,
-        modelUsed: selectedModel,
-        keywords: [coreKeyword, midKeyword, nicheKeyword],
-        sections: [
-          {
-            heading: `1. ${coreKeyword} 핵심 요약 및 준비사항`,
-            text: `${finalTitle} 관련 최신 가이드입니다. 현지 완벽 여행을 위한 체크리스트부터 필수 방문지 동선까지 한눈에 확인하세요.`,
-            image: {
-              url: 'https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=1200&q=80',
-              cdnUrl: 'https://tovoai.com/cdn-proxy/travel/osaka-travel-guide-8k-1001.webp',
-              alt: `${finalTitle} - 8K 실사 이미지 | TOVOAI SEO`
-            }
-          },
-          {
-            heading: `2. ${midKeyword} - 실패 없는 동선 추천`,
-            text: `시간을 200% 아낄 수 있는 동선 노하우를 공개합니다. 현지에서 대기 시간을 최소화하고 만족도를 최대로 높이는 법을 정리했습니다.`,
-            image: {
-              url: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=80',
-              cdnUrl: 'https://tovoai.com/cdn-proxy/food/osaka-dining-recommendation-8k-1002.webp',
-              alt: `${midKeyword} - 8K 실사 이미지 | TOVOAI SEO`
-            }
-          }
-        ]
+    try {
+      const res = await fetch('/api/generate-article', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: finalTitle,
+          coreKeyword,
+          midKeyword,
+          nicheKeyword,
+          model: selectedModel,
+          googleApiKey
+        })
       })
+      const data = await res.json()
+      if (data.success) {
+        setGeneratedArticle(data)
+      }
+    } catch {
+      // Error
+    } finally {
       setGeneratingBlog(false)
-    }, 1500)
+    }
+  }
+
+  // Step 3: Optional Manual / Context Image Post-Injection
+  const handleInjectImageToSection = (sectionIndex: number, keyword: string) => {
+    const sampleImages = [
+      {
+        url: 'https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=1200&q=80',
+        cdnUrl: `https://tovoai.com/cdn-proxy/travel/${keyword.replace(/\s+/g, '-')}-8k-${Date.now()}.webp`,
+        alt: `${keyword} - 8K 실사 이미지 | TOVOAI SEO`
+      },
+      {
+        url: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=80',
+        cdnUrl: `https://tovoai.com/cdn-proxy/food/${keyword.replace(/\s+/g, '-')}-8k-${Date.now()}.webp`,
+        alt: `${keyword} - 8K 실사 이미지 | TOVOAI SEO`
+      }
+    ]
+    setInjectedImages(prev => ({
+      ...prev,
+      [sectionIndex]: sampleImages[sectionIndex % sampleImages.length]
+    }))
   }
 
   const copyFullBlog = () => {
-    if (!generatedBlogContent) return
-    const text = `# ${generatedBlogContent.title}\n\n${generatedBlogContent.sections.map((s: any) => `## ${s.heading}\n\n${s.text}\n\n![${s.image.alt}](${s.image.cdnUrl})`).join('\n\n')}`
-    navigator.clipboard.writeText(text)
+    if (!generatedArticle) return
+    navigator.clipboard.writeText(generatedArticle.fullText)
     setCopiedBlog(true)
     setTimeout(() => setCopiedBlog(false), 2000)
   }
@@ -126,13 +143,13 @@ export default function ContentFactoryPage() {
         <div>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-purple-500/30 bg-purple-500/10 text-xs font-mono text-purple-300 mb-2">
             <Bot className="w-3.5 h-3.5 text-cyan-400" />
-            GOOGLE AI GEMMA-4 MULTI-MODEL CONTENT GENERATOR
+            PURE TEXT GENERATOR &amp; POST-IMAGE INJECTION ENGINE
           </div>
           <h1 className="text-2xl font-bold font-display text-white tracking-tight">
-            🤖 컨텐츠생성기 (AI 블로그 포스트 양산소)
+            🤖 컨텐츠생성기 (순수 AI 텍스트 완벽 작성)
           </h1>
           <p className="text-xs text-slate-400 mt-1">
-            Google Gemma-4-31b-it 기본 엔진 ➔ SEO 키워드 5세트 추천 ➔ 글선(先)생성 ➔ 8K 이미지 후(後)추가
+            Google {selectedModel} 엔진 ➔ 100점짜리 순수 텍스트 블로그 우선 완전 작성 ➔ 필요 시 8K 이미지 후(後)추가
           </p>
         </div>
       </div>
@@ -162,12 +179,13 @@ export default function ContentFactoryPage() {
           <div>
             <label className="block text-xs font-mono text-slate-400 font-bold mb-1.5 flex items-center gap-1.5">
               <Key className="w-3.5 h-3.5 text-indigo-400" />
-              Google AI Studio API Key (주입 완료):
+              Google AI Studio API Key (선택):
             </label>
             <input
               type="password"
               value={googleApiKey}
               onChange={(e) => setGoogleApiKey(e.target.value)}
+              placeholder="미입력 시 기본 엔진 작동"
               className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-300 font-mono focus:outline-none focus:border-indigo-500"
             />
           </div>
@@ -194,12 +212,12 @@ export default function ContentFactoryPage() {
               {loadingStrategy ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin text-purple-200" />
-                  <span>{selectedModel} 분석 중...</span>
+                  <span>{selectedModel} 전략 분석 중...</span>
                 </>
               ) : (
                 <>
                   <Zap className="w-4 h-4 text-cyan-300" />
-                  <span>💡 {selectedModel.split('-')[0].toUpperCase()} 전략 추천</span>
+                  <span>💡 전략 추천</span>
                 </>
               )}
             </button>
@@ -300,19 +318,19 @@ export default function ContentFactoryPage() {
             </div>
 
             <button
-              onClick={handleGenerateBlog}
+              onClick={handleGenerateArticleOnly}
               disabled={generatingBlog}
               className="w-full py-4 bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-purple-500/20 transition-all flex items-center justify-center gap-2"
             >
               {generatingBlog ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin text-white" />
-                  <span>{selectedModel} 포스트 작성 ➔ 8K 이미지 문맥 후(後)추가 중...</span>
+                  <span>{selectedModel} 엔진이 순수 블로그 본문 작성 중...</span>
                 </>
               ) : (
                 <>
                   <Send className="w-4 h-4 text-cyan-300" />
-                  <span>🚀 선택한 키워드로 100점짜리 AI 컨텐츠 생성하기</span>
+                  <span>🚀 {selectedModel} 선택 키워드로 순수 텍스트 블로그 완벽 작성</span>
                 </>
               )}
             </button>
@@ -320,52 +338,76 @@ export default function ContentFactoryPage() {
         )}
       </div>
 
-      {/* Generated Blog Post & Image Auto-injection Result */}
-      {generatedBlogContent && (
+      {/* Step 2 Result: Pure Text Article First (NO Images Initially) */}
+      {generatedArticle && (
         <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 md:p-8 space-y-6 shadow-2xl">
           <div className="flex items-center justify-between border-b border-slate-800 pb-4">
-            <h2 className="text-xl font-bold text-white flex items-center gap-2">
-              <FileText className="w-5 h-5 text-purple-400" />
-              발행 준비 완료된 AI 블로그 컨텐츠 ({generatedBlogContent.modelUsed})
-            </h2>
+            <div className="space-y-1">
+              <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                <FileText className="w-5 h-5 text-purple-400" />
+                작성 완료된 100점짜리 순수 텍스트 블로그 ({generatedArticle.modelUsed})
+              </h2>
+              <p className="text-[11px] text-emerald-400 font-mono">
+                ✓ 이미지는 미포함된 순수 본문 상태입니다. 필요 시 아래 버튼으로 8K 이미지를 단락별 후(後)추가할 수 있습니다.
+              </p>
+            </div>
             <button
               onClick={copyFullBlog}
               className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl transition-all flex items-center gap-1.5"
             >
               {copiedBlog ? <Check className="w-4 h-4 text-emerald-300" /> : <Copy className="w-4 h-4" />}
-              <span>{copiedBlog ? '마크다운 전체 복사 완료!' : '블로그 전체 복사'}</span>
+              <span>{copiedBlog ? '본문 전체 복사 완료!' : '본문 전체 복사'}</span>
             </button>
           </div>
 
-          <div className="space-y-6 text-slate-300 text-xs leading-relaxed">
-            <h1 className="text-2xl font-bold text-white">{generatedBlogContent.title}</h1>
+          <div className="space-y-6 text-slate-300 text-xs leading-relaxed bg-slate-950 p-6 rounded-2xl border border-slate-800 font-mono whitespace-pre-wrap">
+            {generatedArticle.fullText}
+          </div>
 
-            <div className="flex gap-2">
-              {generatedBlogContent.keywords.map((k: string, i: number) => (
-                <span key={i} className="px-2.5 py-1 rounded-md bg-purple-500/20 text-purple-300 text-[10px] font-mono">
-                  #{k}
-                </span>
-              ))}
-            </div>
+          {/* Step 3: Optional Image Post-Injection controls */}
+          <div className="pt-4 border-t border-slate-800 space-y-4">
+            <h3 className="text-xs font-mono font-bold text-cyan-400 flex items-center gap-2">
+              <ImageIcon className="w-4 h-4" />
+              [Step 3] 필요 시 단락별 8K 이미지 선택적 후(後)추가
+            </h3>
 
-            {generatedBlogContent.sections.map((sec: any, idx: number) => (
-              <div key={idx} className="space-y-4 pt-4 border-t border-slate-800/60">
-                <h3 className="text-base font-bold text-white">{sec.heading}</h3>
-                <p className="text-slate-300">{sec.text}</p>
-
-                {/* Post-injected 8K Image */}
-                <div className="rounded-2xl border border-slate-800 bg-slate-950 overflow-hidden space-y-2 p-3">
-                  <div className="flex items-center justify-between text-[10px] font-mono text-cyan-400">
-                    <span className="flex items-center gap-1">
-                      <ImageIcon className="w-3 h-3" /> 문맥 자동 추출 8K 후(後)추가 이미지
-                    </span>
-                    <span>ACTIVE CDN</span>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="p-4 bg-slate-950 border border-slate-800 rounded-xl space-y-3">
+                <div className="text-xs font-bold text-white">단락 1 이미지 후(後)추가 ({coreKeyword})</div>
+                {injectedImages[0] ? (
+                  <div className="space-y-2">
+                    <img src={injectedImages[0].url} className="w-full aspect-video object-cover rounded-lg" />
+                    <div className="text-[10px] font-mono text-cyan-300 truncate">{injectedImages[0].cdnUrl}</div>
                   </div>
-                  <img src={sec.image.url} alt={sec.image.alt} className="w-full aspect-video object-cover rounded-xl" />
-                  <div className="text-[10px] font-mono text-slate-500 truncate">{sec.image.cdnUrl}</div>
-                </div>
+                ) : (
+                  <button
+                    onClick={() => handleInjectImageToSection(0, coreKeyword)}
+                    className="w-full py-2 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded-lg text-xs text-slate-300 font-bold flex items-center justify-center gap-1.5"
+                  >
+                    <Plus className="w-3.5 h-3.5 text-cyan-400" />
+                    <span>단락 1에 8K 이미지 삽입</span>
+                  </button>
+                )}
               </div>
-            ))}
+
+              <div className="p-4 bg-slate-950 border border-slate-800 rounded-xl space-y-3">
+                <div className="text-xs font-bold text-white">단락 2 이미지 후(後)추가 ({midKeyword})</div>
+                {injectedImages[1] ? (
+                  <div className="space-y-2">
+                    <img src={injectedImages[1].url} className="w-full aspect-video object-cover rounded-lg" />
+                    <div className="text-[10px] font-mono text-cyan-300 truncate">{injectedImages[1].cdnUrl}</div>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => handleInjectImageToSection(1, midKeyword)}
+                    className="w-full py-2 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded-lg text-xs text-slate-300 font-bold flex items-center justify-center gap-1.5"
+                  >
+                    <Plus className="w-3.5 h-3.5 text-cyan-400" />
+                    <span>단락 2에 8K 이미지 삽입</span>
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       )}
