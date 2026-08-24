@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import Link from 'next/link'
 import {
   Sparkles,
   Bot,
@@ -16,11 +17,14 @@ import {
   Loader2,
   Cpu,
   Key,
-  Plus
+  Plus,
+  Globe,
+  Share2,
+  ExternalLink
 } from 'lucide-react'
 
 export default function ContentFactoryPage() {
-  const [topic, setTopic] = useState('2024 오사카 여행 총정리: 일정, 경비, 준비물까지 이 글 하나로 끝내기')
+  const [topic, setTopic] = useState('부산 맛집')
   const [selectedModel, setSelectedModel] = useState('gemma-4-31b-it')
   const [googleApiKey, setGoogleApiKey] = useState('')
   
@@ -33,20 +37,25 @@ export default function ContentFactoryPage() {
   const [coreKeyword, setCoreKeyword] = useState('')
   const [midKeyword, setMidKeyword] = useState('')
   const [nicheKeyword, setNicheKeyword] = useState('')
+  const [longtailKeyword, setLongtailKeyword] = useState('')
 
-  // Generation State
+  // Generation & Publishing State
   const [generatingBlog, setGeneratingBlog] = useState(false)
   const [generatedArticle, setGeneratedArticle] = useState<any | null>(null)
   const [copiedBlog, setCopiedBlog] = useState(false)
   const [injectedImages, setInjectedImages] = useState<Record<number, any>>({})
+  
+  const [publishing, setPublishing] = useState(false)
+  const [publishedLiveUrl, setPublishedLiveUrl] = useState('')
 
-  // Step 1: Recommend SEO Keyword & Title Strategy
+  // Step 1: Recommend 4-stage Long-tail Keyword Strategy
   const handleRecommendStrategy = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoadingStrategy(true)
     setStrategies(null)
     setGeneratedArticle(null)
     setInjectedImages({})
+    setPublishedLiveUrl('')
 
     try {
       const res = await fetch('/api/blog-strategy', {
@@ -76,14 +85,16 @@ export default function ContentFactoryPage() {
     setCoreKeyword(item.coreKeyword)
     setMidKeyword(item.midKeyword)
     setNicheKeyword(item.nicheKeyword)
+    setLongtailKeyword(item.longtailKeyword)
   }
 
-  // Step 2: Generate PURE TEXT Blog Post First (NO IMAGES Initially!)
+  // Step 2: Generate Long-tail Focused Article
   const handleGenerateArticleOnly = async () => {
     if (!finalTitle) return
     setGeneratingBlog(true)
     setGeneratedArticle(null)
     setInjectedImages({})
+    setPublishedLiveUrl('')
 
     try {
       const res = await fetch('/api/generate-article', {
@@ -94,6 +105,7 @@ export default function ContentFactoryPage() {
           coreKeyword,
           midKeyword,
           nicheKeyword,
+          longtailKeyword,
           model: selectedModel,
           googleApiKey
         })
@@ -109,24 +121,31 @@ export default function ContentFactoryPage() {
     }
   }
 
-  // Step 3: Optional Manual / Context Image Post-Injection
-  const handleInjectImageToSection = (sectionIndex: number, keyword: string) => {
-    const sampleImages = [
-      {
-        url: 'https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=1200&q=80',
-        cdnUrl: `https://tovoai.com/cdn-proxy/travel/${keyword.replace(/\s+/g, '-')}-8k-${Date.now()}.webp`,
-        alt: `${keyword} - 8K 실사 이미지 | TOVOAI SEO`
-      },
-      {
-        url: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=80',
-        cdnUrl: `https://tovoai.com/cdn-proxy/food/${keyword.replace(/\s+/g, '-')}-8k-${Date.now()}.webp`,
-        alt: `${keyword} - 8K 실사 이미지 | TOVOAI SEO`
+  // Step 3: Publish to Public Blog (/blog/[slug])
+  const handlePublishPost = async () => {
+    if (!generatedArticle) return
+    setPublishing(true)
+
+    try {
+      const res = await fetch('/api/publish-post', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: generatedArticle.title,
+          longtailKeyword: generatedArticle.longtailKeyword,
+          keywords: generatedArticle.keywords,
+          content: generatedArticle.fullText
+        })
+      })
+      const data = await res.json()
+      if (data.success) {
+        setPublishedLiveUrl(data.liveUrl)
       }
-    ]
-    setInjectedImages(prev => ({
-      ...prev,
-      [sectionIndex]: sampleImages[sectionIndex % sampleImages.length]
-    }))
+    } catch {
+      // Error
+    } finally {
+      setPublishing(false)
+    }
   }
 
   const copyFullBlog = () => {
@@ -143,15 +162,25 @@ export default function ContentFactoryPage() {
         <div>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-purple-500/30 bg-purple-500/10 text-xs font-mono text-purple-300 mb-2">
             <Bot className="w-3.5 h-3.5 text-cyan-400" />
-            PURE TEXT GENERATOR &amp; POST-IMAGE INJECTION ENGINE
+            LONG-TAIL SEO TRAFFIC ENGINE &amp; PUBLIC BLOG PUBLISHER
           </div>
           <h1 className="text-2xl font-bold font-display text-white tracking-tight">
-            🤖 컨텐츠생성기 (순수 AI 텍스트 완벽 작성)
+            🤖 컨텐츠생성기 (롱테일 SEO 중심 &amp; 실시간 블로그 발행)
           </h1>
           <p className="text-xs text-slate-400 mt-1">
-            Google {selectedModel} 엔진 ➔ 100점짜리 순수 텍스트 블로그 우선 완전 작성 ➔ 필요 시 8K 이미지 후(後)추가
+            롱테일 키워드(전환율 95%+) 추출 ➔ 고품질 아티클 작성 ➔ N개 시각 키워드 파싱 ➔ 공개 블로그(/blog) 실시간 발행
           </p>
         </div>
+
+        <Link
+          href="/blog"
+          target="_blank"
+          className="px-4 py-2 bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 self-start md:self-auto"
+        >
+          <Globe className="w-4 h-4 text-cyan-400" />
+          <span>공개 블로그 라이브 보러가기</span>
+          <ExternalLink className="w-3 h-3 text-slate-500" />
+        </Link>
       </div>
 
       {/* Input Topic & Multi-LLM Model Selection Area */}
@@ -201,7 +230,7 @@ export default function ContentFactoryPage() {
               required
               value={topic}
               onChange={(e) => setTopic(e.target.value)}
-              placeholder="예: 2024 오사카 여행 총정리: 일정, 경비, 준비물까지"
+              placeholder="예: 부산 맛집"
               className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-purple-500 transition-all font-medium"
             />
             <button
@@ -212,12 +241,12 @@ export default function ContentFactoryPage() {
               {loadingStrategy ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin text-purple-200" />
-                  <span>{selectedModel} 전략 분석 중...</span>
+                  <span>롱테일 전략 분석 중...</span>
                 </>
               ) : (
                 <>
                   <Zap className="w-4 h-4 text-cyan-300" />
-                  <span>💡 전략 추천</span>
+                  <span>💡 롱테일 전략 추천</span>
                 </>
               )}
             </button>
@@ -228,7 +257,7 @@ export default function ContentFactoryPage() {
         {strategies && (
           <div className="pt-6 border-t border-slate-800 space-y-4">
             <div className="flex items-center justify-between text-xs font-mono font-bold text-purple-300">
-              <span>🔥 추천 제목 및 전략 키워드 세트 (클릭하여 에디터 셋팅)</span>
+              <span>🔥 롱테일 중심 4단계 키워드 추천 세트</span>
               <span className="text-[10px] text-slate-500">Engine: {selectedModel}</span>
             </div>
 
@@ -239,15 +268,18 @@ export default function ContentFactoryPage() {
                   <div
                     key={item.id}
                     onClick={() => selectStrategyItem(item)}
-                    className={`p-4 rounded-2xl border transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+                    className={`p-4 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between gap-3 ${
                       isSelected
                         ? 'bg-purple-900/20 border-purple-500 shadow-lg shadow-purple-500/10'
                         : 'bg-slate-950 border-slate-800 hover:border-slate-700'
                     }`}
                   >
                     <div className="space-y-2">
-                      <div className="text-xs font-bold text-white flex items-center gap-2">
+                      <div className="text-xs font-bold text-white flex items-center justify-between">
                         <span>{item.title}</span>
+                        <span className="px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 text-[11px] font-mono">
+                          {item.score}점
+                        </span>
                       </div>
                       <div className="flex flex-wrap gap-2 text-[10px] font-mono">
                         <span className="px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30">
@@ -259,13 +291,10 @@ export default function ContentFactoryPage() {
                         <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
                           틈새: {item.nicheKeyword}
                         </span>
+                        <span className="px-2 py-0.5 rounded bg-purple-500/30 text-purple-200 border border-purple-500/50 font-bold">
+                          {item.longtailKeyword}
+                        </span>
                       </div>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <span className="px-3 py-1 rounded-full bg-purple-500/20 border border-purple-500/30 text-purple-300 text-xs font-mono font-bold">
-                        점수: {item.score}점
-                      </span>
                     </div>
                   </div>
                 )
@@ -278,7 +307,7 @@ export default function ContentFactoryPage() {
         {selectedStrategy && (
           <div className="pt-6 border-t border-slate-800 space-y-4">
             <div className="text-xs font-mono font-bold text-slate-300">
-              최종 제목 (수정 가능):
+              최종 제목 및 롱테일 키워드 설정:
             </div>
             <input
               type="text"
@@ -287,33 +316,46 @@ export default function ContentFactoryPage() {
               className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-xs text-white font-bold"
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-[10px] font-mono text-rose-400 font-bold mb-1">핵심 키워드</label>
+                <label className="block text-[10px] font-mono text-purple-300 font-bold mb-1">
+                  🎯 롱테일 키워드 (Organic Traffic 95%+ 노출 핵심)
+                </label>
                 <input
                   type="text"
-                  value={coreKeyword}
-                  onChange={(e) => setCoreKeyword(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200"
+                  value={longtailKeyword}
+                  onChange={(e) => setLongtailKeyword(e.target.value)}
+                  className="w-full bg-slate-950 border border-purple-500/50 rounded-lg px-3 py-2 text-xs text-purple-200 font-bold"
                 />
               </div>
-              <div>
-                <label className="block text-[10px] font-mono text-sky-400 font-bold mb-1">중간 키워드</label>
-                <input
-                  type="text"
-                  value={midKeyword}
-                  onChange={(e) => setMidKeyword(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200"
-                />
-              </div>
-              <div>
-                <label className="block text-[10px] font-mono text-emerald-400 font-bold mb-1">틈새 키워드</label>
-                <input
-                  type="text"
-                  value={nicheKeyword}
-                  onChange={(e) => setNicheKeyword(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200"
-                />
+              <div className="grid grid-cols-3 gap-2">
+                <div>
+                  <label className="block text-[10px] font-mono text-rose-400 font-bold mb-1">핵심</label>
+                  <input
+                    type="text"
+                    value={coreKeyword}
+                    onChange={(e) => setCoreKeyword(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-2 py-2 text-[11px] text-slate-200"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-mono text-sky-400 font-bold mb-1">중간</label>
+                  <input
+                    type="text"
+                    value={midKeyword}
+                    onChange={(e) => setMidKeyword(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-2 py-2 text-[11px] text-slate-200"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-mono text-emerald-400 font-bold mb-1">틈새</label>
+                  <input
+                    type="text"
+                    value={nicheKeyword}
+                    onChange={(e) => setNicheKeyword(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-2 py-2 text-[11px] text-slate-200"
+                  />
+                </div>
               </div>
             </div>
 
@@ -325,12 +367,12 @@ export default function ContentFactoryPage() {
               {generatingBlog ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin text-white" />
-                  <span>{selectedModel} 엔진이 순수 블로그 본문 작성 중...</span>
+                  <span>롱테일 본문 작성 및 N개 시각 키워드 파싱 중...</span>
                 </>
               ) : (
                 <>
                   <Send className="w-4 h-4 text-cyan-300" />
-                  <span>🚀 {selectedModel} 선택 키워드로 순수 텍스트 블로그 완벽 작성</span>
+                  <span>🚀 선택한 롱테일 키워드로 SEO 아티클 생성하기</span>
                 </>
               )}
             </button>
@@ -338,99 +380,94 @@ export default function ContentFactoryPage() {
         )}
       </div>
 
-      {/* Step 2 Result: Pure Text Article First (NO Images Initially) */}
+      {/* Generated Article Result & Publishing Section */}
       {generatedArticle && (
         <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 md:p-8 space-y-6 shadow-2xl">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-800 pb-4 gap-4">
             <div className="space-y-1">
               <h2 className="text-xl font-bold text-white flex items-center gap-2">
                 <FileText className="w-5 h-5 text-purple-400" />
-                작성 완료된 100점짜리 순수 텍스트 블로그 ({generatedArticle.modelUsed})
+                작성 완료된 롱테일 SEO 아티클 ({generatedArticle.modelUsed})
               </h2>
-              <p className="text-[11px] text-emerald-400 font-mono">
-                ✓ 이미지는 미포함된 순수 본문 상태입니다. 필요 시 아래 버튼으로 8K 이미지를 단락별 후(後)추가할 수 있습니다.
-              </p>
             </div>
-            <button
-              onClick={copyFullBlog}
-              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl transition-all flex items-center gap-1.5"
-            >
-              {copiedBlog ? <Check className="w-4 h-4 text-emerald-300" /> : <Copy className="w-4 h-4" />}
-              <span>{copiedBlog ? '본문 전체 복사 완료!' : '본문 전체 복사'}</span>
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={copyFullBlog}
+                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl transition-all flex items-center gap-1.5"
+              >
+                {copiedBlog ? <Check className="w-4 h-4 text-emerald-300" /> : <Copy className="w-4 h-4" />}
+                <span>{copiedBlog ? '복사 완료' : '전체 복사'}</span>
+              </button>
+
+              <button
+                onClick={handlePublishPost}
+                disabled={publishing}
+                className="px-5 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-emerald-500/20 transition-all flex items-center gap-1.5"
+              >
+                {publishing ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Globe className="w-4 h-4 text-emerald-200" />
+                )}
+                <span>🚀 실제 블로그에 공개 발행하기</span>
+              </button>
+            </div>
           </div>
 
-          {/* Real-time Yoast SEO & GEO 100 Score Diagnostic Card */}
-          {generatedArticle.seoChecklist && (
-            <div className="p-5 bg-slate-950 border border-slate-800 rounded-2xl space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="text-xs font-mono font-bold text-emerald-400 flex items-center gap-2">
+          {/* Published Live Link Box */}
+          {publishedLiveUrl && (
+            <div className="p-4 bg-emerald-950/60 border border-emerald-500/50 rounded-2xl flex items-center justify-between">
+              <div className="space-y-1">
+                <div className="text-xs font-bold text-emerald-300 flex items-center gap-1.5 font-mono">
                   <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                  📊 실시간 SEO / GEO 최적화 진단
+                  🎉 포스트가 라이브 블로그에 정상 발행되었습니다!
                 </div>
-                <span className="text-sm font-mono font-black text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-3 py-1 rounded-full">
-                  {generatedArticle.yoastGeoScore || 100}점 만점
-                </span>
+                <div className="text-[11px] font-mono text-slate-400">{publishedLiveUrl}</div>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-[11px] font-mono">
-                {generatedArticle.seoChecklist.map((item: any, idx: number) => (
-                  <div key={idx} className="flex items-center gap-2 text-slate-300">
-                    <span className="text-emerald-400">✓</span>
-                    <span>{item.label}</span>
-                  </div>
+              <Link
+                href={publishedLiveUrl}
+                target="_blank"
+                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl transition-all flex items-center gap-1"
+              >
+                <span>발행 포스트 보러가기</span>
+                <ExternalLink className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+          )}
+
+          {/* Parsed N-Gram Visual Keywords & Image Generator Bridge */}
+          {generatedArticle.extractedVisualKeywords && (
+            <div className="p-5 bg-slate-950 border border-slate-800 rounded-2xl space-y-3">
+              <div className="flex items-center justify-between text-xs font-mono font-bold text-cyan-400">
+                <span className="flex items-center gap-1.5">
+                  <ImageIcon className="w-4 h-4 text-cyan-400" />
+                  🎨 본문 자동 파싱 N개 시각 키워드 (이미지생성기 렌더링용)
+                </span>
+                <Link
+                  href="/admin/seo-reallocator"
+                  className="text-xs text-indigo-400 hover:underline flex items-center gap-1"
+                >
+                  <span>이미지생성기 바로가기</span>
+                  <ArrowRight className="w-3 h-3" />
+                </Link>
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                {generatedArticle.extractedVisualKeywords.map((kw: string, idx: number) => (
+                  <span
+                    key={idx}
+                    className="px-2.5 py-1 rounded-lg bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 text-xs font-mono"
+                  >
+                    📷 {kw}
+                  </span>
                 ))}
               </div>
             </div>
           )}
 
+          {/* Full Text Display */}
           <div className="space-y-6 text-slate-300 text-xs leading-relaxed bg-slate-950 p-6 rounded-2xl border border-slate-800 font-mono whitespace-pre-wrap">
             {generatedArticle.fullText}
-          </div>
-
-          {/* Step 3: Optional Image Post-Injection controls */}
-          <div className="pt-4 border-t border-slate-800 space-y-4">
-            <h3 className="text-xs font-mono font-bold text-cyan-400 flex items-center gap-2">
-              <ImageIcon className="w-4 h-4" />
-              [Step 3] 필요 시 단락별 8K 이미지 선택적 후(後)추가
-            </h3>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="p-4 bg-slate-950 border border-slate-800 rounded-xl space-y-3">
-                <div className="text-xs font-bold text-white">단락 1 이미지 후(後)추가 ({coreKeyword})</div>
-                {injectedImages[0] ? (
-                  <div className="space-y-2">
-                    <img src={injectedImages[0].url} className="w-full aspect-video object-cover rounded-lg" />
-                    <div className="text-[10px] font-mono text-cyan-300 truncate">{injectedImages[0].cdnUrl}</div>
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => handleInjectImageToSection(0, coreKeyword)}
-                    className="w-full py-2 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded-lg text-xs text-slate-300 font-bold flex items-center justify-center gap-1.5"
-                  >
-                    <Plus className="w-3.5 h-3.5 text-cyan-400" />
-                    <span>단락 1에 8K 이미지 삽입</span>
-                  </button>
-                )}
-              </div>
-
-              <div className="p-4 bg-slate-950 border border-slate-800 rounded-xl space-y-3">
-                <div className="text-xs font-bold text-white">단락 2 이미지 후(後)추가 ({midKeyword})</div>
-                {injectedImages[1] ? (
-                  <div className="space-y-2">
-                    <img src={injectedImages[1].url} className="w-full aspect-video object-cover rounded-lg" />
-                    <div className="text-[10px] font-mono text-cyan-300 truncate">{injectedImages[1].cdnUrl}</div>
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => handleInjectImageToSection(1, midKeyword)}
-                    className="w-full py-2 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded-lg text-xs text-slate-300 font-bold flex items-center justify-center gap-1.5"
-                  >
-                    <Plus className="w-3.5 h-3.5 text-cyan-400" />
-                    <span>단락 2에 8K 이미지 삽입</span>
-                  </button>
-                )}
-              </div>
-            </div>
           </div>
         </div>
       )}

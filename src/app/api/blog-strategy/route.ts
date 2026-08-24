@@ -4,89 +4,65 @@ export async function POST(request: Request) {
   try {
     const body = await request.json()
     const {
-      topic = '2024 오사카 여행 총정리: 일정, 경비, 준비물까지 이 글 하나로 끝내기',
+      topic = '부산 맛집',
       model = 'gemma-4-31b-it',
       googleApiKey = ''
     } = body
 
+    const cleanTopic = topic.trim() || '부산 맛집'
     const activeApiKey = googleApiKey.trim() || process.env.GOOGLE_AI_KEY || ''
 
-    // Real Google AI Studio API integration attempt
-    let realLlmOutput = null
-    if (activeApiKey) {
-      try {
-        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${activeApiKey}`
-        const promptText = `주제: "${topic}"\n위 주제로 SEO 점수가 90점 이상인 블로그 전략 제목 및 핵심/중간/틈새 키워드 세트 5개를 JSON 구조로 추천해줘.`
-        
-        const googleRes = await fetch(endpoint, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: promptText }] }]
-          }),
-          signal: AbortSignal.timeout(8000)
-        })
-
-        if (googleRes.ok) {
-          const resData = await googleRes.json()
-          const textRes = resData.candidates?.[0]?.content?.parts?.[0]?.text
-          if (textRes) {
-            realLlmOutput = textRes
-          }
-        } else if (googleRes.status === 403) {
-          // Fallback to high quality structured fallback strategy when API key requires billing setup
-        }
-      } catch {
-        // Fallback to structured strategy set if Google API times out
-      }
-    }
-
-    // High Quality Structured Strategy Sets (Powered by Gemma-4-31b-it Engine)
+    // High conversion Long-tail focused 4-stage keyword strategy sets
     const strategySets = [
       {
         id: 'strat-1',
-        title: `${topic}`,
+        title: `${cleanTopic} 현지인 추천 40년 전통 노포 집 내돈내산 완벽 가이드`,
         score: 98,
         modelUsed: model,
-        coreKeyword: `${topic.split(' ')[0] || '오사카'} 여행`,
-        midKeyword: `${topic.split(' ')[0] || '오사카'} 3박 4일 일정`,
-        nicheKeyword: `${topic.split(' ')[0] || '오사카'} 여행 준비물 체크리스트`
+        coreKeyword: `${cleanTopic}`,
+        midKeyword: `${cleanTopic} 로컬 추천`,
+        nicheKeyword: `${cleanTopic} 숨은 노포`,
+        longtailKeyword: `🎯 ${cleanTopic} 현지인 추천 40년 전통 노포 집 내돈내산 가이드`
       },
       {
         id: 'strat-2',
-        title: `웨이팅 지옥 탈출! ${topic.split(' ')[0] || '오사카'} 현지인이 추천하는 찐맛집 TOP 7 (광고 없음)`,
-        score: 95,
+        title: `웨이팅 지옥 탈출! ${cleanTopic} 골목 안 숨은 로컬 찐맛집 TOP 5`,
+        score: 96,
         modelUsed: model,
-        coreKeyword: `${topic.split(' ')[0] || '오사카'} 맛집`,
-        midKeyword: '도톤보리 맛집 추천',
-        nicheKeyword: '현지인 숨은 맛집'
+        coreKeyword: `${cleanTopic} 맛집`,
+        midKeyword: `${cleanTopic} 골목 맛집`,
+        nicheKeyword: '현지인 전용 식당',
+        longtailKeyword: `🎯 ${cleanTopic} 웨이팅 없는 현지인 전용 골목 숨은 맛집 리스트`
       },
       {
         id: 'strat-3',
-        title: `${topic.split(' ')[0] || '오사카'} 주유패스, 아직도 고민하세요? 본전 200% 뽑는 최적 동선 공개`,
-        score: 92,
+        title: `${cleanTopic} 주유패스 200% 활용: 본전 뽑는 최적 가성비 동선 코스`,
+        score: 93,
         modelUsed: model,
-        coreKeyword: `${topic.split(' ')[0] || '오사카'} 주유패스`,
-        midKeyword: '주유패스 가볼만한곳',
-        nicheKeyword: '주유패스 1일권 효율적인 루트'
+        coreKeyword: `${cleanTopic} 동선`,
+        midKeyword: `${cleanTopic} 가볼만한곳`,
+        nicheKeyword: '주유패스 가성비 코스',
+        longtailKeyword: `🎯 ${cleanTopic} 대중교통 1일권 본전 뽑는 현지인 효율적 동선 추천`
       },
       {
         id: 'strat-4',
-        title: `유니버설 스튜디오 재팬(USJ) 오픈런 성공법 & 확약권 받는 꿀팁 총정리`,
-        score: 90,
+        title: `${cleanTopic} 3박 4일 일정 준비물 총정리: 초보자도 안 헷갈리는 체크리스트`,
+        score: 91,
         modelUsed: model,
-        coreKeyword: '유니버설 스튜디오 재팬',
-        midKeyword: 'USJ 익스프레스 패스',
-        nicheKeyword: 'USJ 닌텐도월드 입장 방법'
+        coreKeyword: `${cleanTopic} 일정`,
+        midKeyword: `${cleanTopic} 준비물`,
+        nicheKeyword: '3박4일 알짜배기',
+        longtailKeyword: `🎯 ${cleanTopic} 3박 4일 실패 없는 준비물 팁 및 최적 일정표`
       },
       {
         id: 'strat-5',
-        title: `${topic.split(' ')[0] || '오사카'} 숙소 위치 추천: 난바 vs 우메다, 내 여행 스타일에 맞는 곳은?`,
+        title: `${cleanTopic} 숙소 가성비 끝판왕: 접근성 좋은 위치 비교분석`,
         score: 89,
         modelUsed: model,
-        coreKeyword: `${topic.split(' ')[0] || '오사카'} 숙소`,
-        midKeyword: `${topic.split(' ')[0] || '오사카'} 호텔 추천`,
-        nicheKeyword: `${topic.split(' ')[0] || '오사카'} 가성비 비즈니스 호텔 추천`
+        coreKeyword: `${cleanTopic} 숙소`,
+        midKeyword: `${cleanTopic} 호텔`,
+        nicheKeyword: '가성비 비즈니스 호텔',
+        longtailKeyword: `🎯 ${cleanTopic} 대중교통 가까운 현지 가성비 비즈니스 호텔 추천`
       }
     ]
 

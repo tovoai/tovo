@@ -75,6 +75,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const settingsMenuItems = [
     {
+      name: '프롬프트 스튜디오',
+      href: '/admin/prompt-studio',
+      icon: Settings,
+    },
+    {
       name: '비밀번호 변경 / 보안',
       href: '/admin/settings',
       icon: Key,
