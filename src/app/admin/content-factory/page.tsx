@@ -360,6 +360,29 @@ export default function ContentFactoryPage() {
             </button>
           </div>
 
+          {/* Real-time Yoast SEO & GEO 100 Score Diagnostic Card */}
+          {generatedArticle.seoChecklist && (
+            <div className="p-5 bg-slate-950 border border-slate-800 rounded-2xl space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="text-xs font-mono font-bold text-emerald-400 flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                  📊 실시간 SEO / GEO 최적화 진단
+                </div>
+                <span className="text-sm font-mono font-black text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-3 py-1 rounded-full">
+                  {generatedArticle.yoastGeoScore || 100}점 만점
+                </span>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-[11px] font-mono">
+                {generatedArticle.seoChecklist.map((item: any, idx: number) => (
+                  <div key={idx} className="flex items-center gap-2 text-slate-300">
+                    <span className="text-emerald-400">✓</span>
+                    <span>{item.label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div className="space-y-6 text-slate-300 text-xs leading-relaxed bg-slate-950 p-6 rounded-2xl border border-slate-800 font-mono whitespace-pre-wrap">
             {generatedArticle.fullText}
           </div>
