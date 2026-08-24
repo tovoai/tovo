@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 
 // Global In-Memory Published Posts Store for Immediate Public Access
-export const publishedPostsStore: any[] = [
+const publishedPostsStore: any[] = [
   {
     id: 'post-1',
     slug: 'busan-local-restaurant-guide-2024',
