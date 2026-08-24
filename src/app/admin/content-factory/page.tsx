@@ -13,11 +13,16 @@ import {
   ImageIcon,
   ArrowRight,
   Send,
-  Loader2
+  Loader2,
+  Cpu,
+  Key
 } from 'lucide-react'
 
 export default function ContentFactoryPage() {
   const [topic, setTopic] = useState('2024 오사카 여행 총정리: 일정, 경비, 준비물까지 이 글 하나로 끝내기')
+  const [selectedModel, setSelectedModel] = useState('gemma-4-31b-it')
+  const [googleApiKey, setGoogleApiKey] = useState('')
+  
   const [loadingStrategy, setLoadingStrategy] = useState(false)
   const [strategies, setStrategies] = useState<any[] | null>(null)
   
@@ -44,12 +49,15 @@ export default function ContentFactoryPage() {
       const res = await fetch('/api/blog-strategy', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ topic })
+        body: JSON.stringify({
+          topic,
+          model: selectedModel,
+          googleApiKey
+        })
       })
       const data = await res.json()
       if (data.success) {
         setStrategies(data.strategies)
-        // Auto select top 98 score strategy
         selectStrategyItem(data.strategies[0])
       }
     } catch {
@@ -76,6 +84,7 @@ export default function ContentFactoryPage() {
     setTimeout(() => {
       setGeneratedBlogContent({
         title: finalTitle,
+        modelUsed: selectedModel,
         keywords: [coreKeyword, midKeyword, nicheKeyword],
         sections: [
           {
@@ -117,19 +126,53 @@ export default function ContentFactoryPage() {
         <div>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-purple-500/30 bg-purple-500/10 text-xs font-mono text-purple-300 mb-2">
             <Bot className="w-3.5 h-3.5 text-cyan-400" />
-            AI BLOG STRATEGY &amp; AUTO IMAGE INJECTION FACTORY
+            GOOGLE AI GEMMA-4 MULTI-MODEL CONTENT GENERATOR
           </div>
           <h1 className="text-2xl font-bold font-display text-white tracking-tight">
-            🤖 AI 블로그 기획 / 양산소
+            🤖 컨텐츠생성기 (AI 블로그 포스트 양산소)
           </h1>
           <p className="text-xs text-slate-400 mt-1">
-            SEO 적합도 점수별 전략 키워드 추천 ➔ AI 블로그 글선(先)생성 ➔ 8K 이미지 후(後)추가 자동 연동 프로세스
+            Google Gemma-4-31b-it 기본 엔진 ➔ SEO 키워드 5세트 추천 ➔ 글선(先)생성 ➔ 8K 이미지 후(後)추가
           </p>
         </div>
       </div>
 
-      {/* Input Topic Area */}
+      {/* Input Topic & Multi-LLM Model Selection Area */}
       <div className="bg-slate-900/80 border border-slate-800 rounded-3xl p-6 md:p-8 backdrop-blur-xl shadow-xl space-y-6">
+        {/* Model Selection Dropdown */}
+        <div className="p-4 bg-slate-950 border border-slate-800 rounded-2xl grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs font-mono text-purple-300 font-bold mb-1.5 flex items-center gap-1.5">
+              <Cpu className="w-3.5 h-3.5 text-cyan-400" />
+              구글 AI LLM 선택 (기본: gemma-4-31b-it):
+            </label>
+            <select
+              value={selectedModel}
+              onChange={(e) => setSelectedModel(e.target.value)}
+              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-purple-500"
+            >
+              <option value="gemma-4-31b-it">⭐ gemma-4-31b-it (기본 추천 모델)</option>
+              <option value="gemma-4-26b-a4b-it">gemma-4-26b-a4b-it</option>
+              <option value="gemini-3.1-flash-lite">Gemini 3.1 Flash Lite</option>
+              <option value="gemini-3.5-flash-lite">Gemini 3.5 Flash Lite</option>
+              <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash Lite</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-xs font-mono text-slate-400 font-bold mb-1.5 flex items-center gap-1.5">
+              <Key className="w-3.5 h-3.5 text-indigo-400" />
+              Google AI Studio API Key (주입 완료):
+            </label>
+            <input
+              type="password"
+              value={googleApiKey}
+              onChange={(e) => setGoogleApiKey(e.target.value)}
+              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-300 font-mono focus:outline-none focus:border-indigo-500"
+            />
+          </div>
+        </div>
+
         <form onSubmit={handleRecommendStrategy} className="space-y-4">
           <label className="block text-xs font-mono text-slate-300 font-bold">
             초기 타겟 키워드 (또는 주제):
@@ -151,12 +194,12 @@ export default function ContentFactoryPage() {
               {loadingStrategy ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin text-purple-200" />
-                  <span>SEO 전략 분석 중...</span>
+                  <span>{selectedModel} 분석 중...</span>
                 </>
               ) : (
                 <>
                   <Zap className="w-4 h-4 text-cyan-300" />
-                  <span>💡 AI 전략 추천</span>
+                  <span>💡 {selectedModel.split('-')[0].toUpperCase()} 전략 추천</span>
                 </>
               )}
             </button>
@@ -166,8 +209,9 @@ export default function ContentFactoryPage() {
         {/* Recommended Title & Strategy Keyword Set */}
         {strategies && (
           <div className="pt-6 border-t border-slate-800 space-y-4">
-            <div className="text-xs font-mono font-bold text-purple-300 flex items-center gap-1.5">
+            <div className="flex items-center justify-between text-xs font-mono font-bold text-purple-300">
               <span>🔥 추천 제목 및 전략 키워드 세트 (클릭하여 에디터 셋팅)</span>
+              <span className="text-[10px] text-slate-500">Engine: {selectedModel}</span>
             </div>
 
             <div className="space-y-3">
@@ -263,12 +307,12 @@ export default function ContentFactoryPage() {
               {generatingBlog ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin text-white" />
-                  <span>글 선(先) 작성 ➔ 8K 이미지 문맥 후(後)추가 생성 중...</span>
+                  <span>{selectedModel} 포스트 작성 ➔ 8K 이미지 문맥 후(後)추가 중...</span>
                 </>
               ) : (
                 <>
                   <Send className="w-4 h-4 text-cyan-300" />
-                  <span>🚀 선택한 키워드로 100점짜리 AI 블로그 생성하기</span>
+                  <span>🚀 선택한 키워드로 100점짜리 AI 컨텐츠 생성하기</span>
                 </>
               )}
             </button>
@@ -282,7 +326,7 @@ export default function ContentFactoryPage() {
           <div className="flex items-center justify-between border-b border-slate-800 pb-4">
             <h2 className="text-xl font-bold text-white flex items-center gap-2">
               <FileText className="w-5 h-5 text-purple-400" />
-              발행 준비 완료된 AI 블로그 포스트
+              발행 준비 완료된 AI 블로그 컨텐츠 ({generatedBlogContent.modelUsed})
             </h2>
             <button
               onClick={copyFullBlog}

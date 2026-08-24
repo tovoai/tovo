@@ -52,14 +52,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       exact: true,
     },
     {
+      name: '컨텐츠생성기',
+      href: '/admin/content-factory',
+      icon: Sparkles,
+    },
+    {
       name: '이미지생성기',
       href: '/admin/seo-reallocator',
       icon: RefreshCw,
-    },
-    {
-      name: 'AI 블로그 양산소',
-      href: '/admin/content-factory',
-      icon: Sparkles,
     },
     {
       name: '고객분석',
