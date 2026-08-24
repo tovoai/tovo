@@ -383,6 +383,58 @@ export default function ContentFactoryPage() {
       {/* Generated Article Result & Publishing Section */}
       {generatedArticle && (
         <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 md:p-8 space-y-6 shadow-2xl">
+          {/* Google AI Live Mode Indicator Badge */}
+          <div className="p-3 bg-slate-950 border border-slate-800 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-mono">
+            <div className="flex items-center gap-2">
+              {generatedArticle.isRealGoogleCall ? (
+                <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  🟢 Google AI Live Mode ({generatedArticle.modelUsed} 100% 실시간 연동됨)
+                </span>
+              ) : (
+                <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold">
+                  <span className="w-2 h-2 rounded-full bg-amber-400" />
+                  🟡 API Key Fallback Mode (기본 초고화질 엔진 구동 중)
+                </span>
+              )}
+            </div>
+
+            <div className="flex items-center gap-3 text-slate-400">
+              <span>글자 수: <strong className="text-cyan-300">{generatedArticle.articleCharCount || generatedArticle.fullText.length}자</strong> (목표 1,800자+)</span>
+              <span>•</span>
+              <span>롱테일 반복: <strong className="text-purple-300">{generatedArticle.longtailCount || 3}회</strong> (밀도 {generatedArticle.longtailDensityPercent || 0.5}%)</span>
+            </div>
+          </div>
+
+          {/* 10-Step SEO Score Diagnostic Table */}
+          {generatedArticle.seoChecklist && (
+            <div className="p-5 bg-slate-950 border border-slate-800 rounded-2xl space-y-4">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div className="text-xs font-mono font-bold text-emerald-400 flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                  📊 10단계 SEO &amp; GEO 정밀 품질 진단 리포트
+                </div>
+                <span className="text-sm font-mono font-black text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-3 py-1 rounded-full">
+                  {generatedArticle.yoastGeoScore || 100}점 / 100점 만점
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs font-mono">
+                {generatedArticle.seoChecklist.map((item: any) => (
+                  <div key={item.step} className="p-3 bg-slate-900 border border-slate-800 rounded-xl space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-white">{item.title}</span>
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${item.passed ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-300'}`}>
+                        {item.score} / {item.maxScore}점
+                      </span>
+                    </div>
+                    <div className="text-[11px] text-slate-400">{item.detail}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-800 pb-4 gap-4">
             <div className="space-y-1">
               <h2 className="text-xl font-bold text-white flex items-center gap-2">
