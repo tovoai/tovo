@@ -154,36 +154,43 @@ export default function GalleryPage() {
           </div>
         </section>
 
-        {/* Dynamic Category Chips */}
-        <section className="mb-10">
-          <div className="flex items-center gap-2 mb-4">
-            <Filter className="w-4 h-4 text-indigo-400" />
-            <span className="text-xs font-mono text-slate-400 uppercase tracking-wider">Dynamic Category Nodes</span>
+        {/* 4-Level Interactive Archive Tree Classifier */}
+        <section className="mb-10 p-6 bg-slate-900/80 border border-slate-800 rounded-3xl backdrop-blur-xl space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Layers className="w-5 h-5 text-indigo-400" />
+              <h2 className="text-base font-bold text-white font-mono uppercase tracking-wider">
+                TOVOAI 4단계 아카이브 분류 트리 (4-Level Structured Archive Tree)
+              </h2>
+            </div>
+            <span className="text-xs font-mono text-slate-400">
+              L1: 대분류(10) ➔ L2: 중분류(35) ➔ L3: 소분류(25) ➔ L4: 에셋 CDN
+            </span>
           </div>
 
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-800">
             <button
               onClick={() => setSelectedCategory("all")}
               className={`px-4 py-2 rounded-xl text-xs font-bold font-mono transition-all ${
                 selectedCategory === "all"
                   ? "bg-gradient-to-r from-indigo-600 to-cyan-600 text-white shadow-lg shadow-indigo-500/25"
-                  : "bg-slate-900 border border-slate-800 text-slate-400 hover:text-white"
+                  : "bg-slate-950 border border-slate-800 text-slate-400 hover:text-white"
               }`}
             >
-              전체 보기 (All)
+              🌐 전체 통합 아카이브
             </button>
 
-            {DEFAULT_CATEGORY_NODES.map((node) => (
+            {DEFAULT_CATEGORY_NODES.filter(n => n.level === 1).map((node) => (
               <button
                 key={node.id}
                 onClick={() => setSelectedCategory(node.slug)}
-                className={`px-4 py-2 rounded-xl text-xs font-bold font-mono transition-all ${
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold font-mono transition-all flex items-center gap-1.5 ${
                   selectedCategory === node.slug
-                    ? "bg-gradient-to-r from-indigo-600 to-cyan-600 text-white shadow-lg shadow-indigo-500/25"
-                    : "bg-slate-900 border border-slate-800 text-slate-400 hover:text-white"
+                    ? "bg-indigo-600 text-white shadow-lg shadow-indigo-600/30"
+                    : "bg-slate-950 border border-slate-800 text-slate-400 hover:text-slate-200"
                 }`}
               >
-                {node.nameKo} ({node.count})
+                <span>{node.nameKo}</span>
               </button>
             ))}
           </div>

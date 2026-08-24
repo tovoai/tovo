@@ -46,23 +46,23 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const mainMenuItems = [
     {
-      name: '컨트롤 개요',
+      name: '컨트롤 스튜디오',
       href: '/admin',
       icon: LayoutDashboard,
       exact: true,
     },
     {
-      name: 'SEO 점수 & 배치 생성',
+      name: '이미지생성기',
       href: '/admin/seo-reallocator',
       icon: RefreshCw,
     },
     {
-      name: '고객사 분석 & 에셋',
+      name: '고객분석',
       href: '/admin/client-audit',
       icon: BarChart3,
     },
     {
-      name: '글로벌 벤치마크',
+      name: '벤치마크',
       href: '/admin/benchmark',
       icon: Trophy,
     },
@@ -79,8 +79,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
       {/* WordPress-style Top Admin Bar */}
-      <header className="h-14 bg-slate-900 border-b border-slate-800 px-4 flex items-center justify-between sticky top-0 z-50">
-        <div className="flex items-center gap-4">
+      <header className="h-14 bg-slate-900 border-b border-slate-800 px-3 flex items-center justify-between sticky top-0 z-50">
+        <div className="flex items-center gap-2">
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
             className="md:hidden p-1 text-slate-400 hover:text-white"
@@ -89,7 +89,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </button>
 
           {/* Site Logo -> Home navigation */}
-          <Link href="/" className="group flex items-center gap-2">
+          <Link href="/" className="group flex items-center gap-1.5">
             <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 via-violet-500 to-cyan-400 shadow-md">
               <Sparkles className="h-3.5 w-3.5 text-white" />
             </span>
@@ -98,10 +98,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </span>
           </Link>
 
-          <span className="text-slate-700">|</span>
+          <span className="text-slate-800 font-light">/</span>
 
           {/* Dynamic Version badge shown ONLY in admin area */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center">
             <span className="px-2 py-0.5 text-[10px] font-mono font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 rounded-md">
               v{appVersion} Admin
             </span>
@@ -180,7 +180,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 transition-all"
                 >
                   <ImageIcon className="w-4 h-4 text-cyan-400" />
-                  <span>8K 갤러리 스튜디오</span>
+                  <span>아카이브</span>
                 </Link>
               </nav>
             </div>
