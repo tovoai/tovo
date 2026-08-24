@@ -33,6 +33,8 @@ export async function POST(request: Request) {
           if (textRes) {
             realLlmOutput = textRes
           }
+        } else if (googleRes.status === 403) {
+          // Fallback to high quality structured fallback strategy when API key requires billing setup
         }
       } catch {
         // Fallback to structured strategy set if Google API times out
